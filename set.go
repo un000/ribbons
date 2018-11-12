@@ -15,10 +15,7 @@ type UINT64Set struct {
 }
 
 func (u *UINT64Set) Has(key uint64) bool {
-	switch {
-	case !u.initialized || len(u.set) == 0:
-		return false
-	case key < u.min:
+	if !u.initialized || len(u.set) == 0 || key < u.min {
 		return false
 	}
 
@@ -34,7 +31,7 @@ func (u *UINT64Set) Add(key uint64) *UINT64Set {
 	switch {
 	case len(u.set) == 0:
 		u.min = key
-		u.set = append(u.set, setBit(0, 0))
+		u.set = append(u.set, 1)
 		u.size++
 		u.initialized = true
 	case u.initialized && key == u.min:
