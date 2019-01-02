@@ -123,12 +123,10 @@ func (u *UINT64Set) Mul(u2 *UINT64Set) {
 func (u *UINT64Set) List() []uint64 {
 	res := make([]uint64, 0, u.size)
 	for i, l := uint64(0), uint64(len(u.set)); i < l; i++ {
-		if u.set[i] == 0 {
-			continue
-		}
-
 		values := extractToggledBits(u.set[i], u.min+i*64)
-		res = append(res, values...)
+		if len(values) > 0 {
+			res = append(res, values...)
+		}
 	}
 
 	return res
