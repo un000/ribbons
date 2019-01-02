@@ -1,6 +1,7 @@
 package ribbons
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -11,6 +12,20 @@ type UINT64Set struct {
 	size int
 
 	initialized bool
+}
+
+func New() UINT64Set {
+	return UINT64Set{}
+}
+
+func NewFromJSON(j []byte) (UINT64Set, error) {
+	set := New()
+	err := json.Unmarshal(j, &set)
+	if err != nil {
+		return set, err
+	}
+
+	return set, nil
 }
 
 func (u *UINT64Set) Has(key uint64) bool {
