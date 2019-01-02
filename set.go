@@ -1,8 +1,7 @@
 package ribbons
 
 import (
-	"encoding/json"
-	"sort"
+	"fmt"
 )
 
 type UINT64Set struct {
@@ -56,6 +55,8 @@ func (u *UINT64Set) Add(key uint64) *UINT64Set {
 			newSet.Add(prev)
 		}
 		*u = newSet
+	default:
+		panic(fmt.Sprintf("unexpected behaviour; key: %v; set: %+v", key, u))
 	}
 
 	return u
@@ -116,22 +117,6 @@ func (u *UINT64Set) List() []uint64 {
 	}
 
 	return res
-}
-
-func (u *UINT64Set) UnmarshalJSON(b []byte) error {
-	list := make([]uint64, 0)
-	err := json.Unmarshal(b, &list)
-	if err != nil {
-		return err
-	}
-
-	// make Add efficient
-	sort.Slice(list, func(i, j int) bool { return list[i] < list[j] })
-	for i := 0; i < len(list); i++ {
-		u.Add(list[i])
-	}
-
-	return nil
 }
 
 func (u *UINT64Set) getPositionInsideBucket(key uint64) uint64 {
