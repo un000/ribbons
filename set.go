@@ -132,6 +132,10 @@ func (u *UINT64Set) List() []uint64 {
 	return res
 }
 
+func (u *UINT64Set) Initialized() bool {
+	return u.initialized
+}
+
 func (u *UINT64Set) getPositionInsideBucket(key uint64) uint64 {
 	return (key - u.min) % 64
 }

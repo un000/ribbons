@@ -11,12 +11,12 @@ import (
 func TestRibbons(t *testing.T) {
 	Convey("Check the main logic", t, func() {
 		Convey("Check empty", func() {
-			s := UINT64Set{}
+			s := New()
 			So(s.Has(2), ShouldBeFalse)
 		})
 
 		Convey("Check combinations of the added values", func() {
-			s := UINT64Set{}
+			s := New()
 			So(s.Len(), ShouldEqual, 0)
 
 			s.Add(128)
@@ -46,7 +46,7 @@ func TestRibbons(t *testing.T) {
 		})
 
 		Convey("Check that some values exist", func() {
-			s := UINT64Set{}
+			s := New()
 			s.Add(5)
 			s.Add(8)
 			s.Add(32)
@@ -69,19 +69,32 @@ func TestRibbons(t *testing.T) {
 		})
 
 		Convey("Check unmarshal", func() {
-			s := UINT64Set{}
-			err := json.Unmarshal([]byte(`[1, 2, 0, 1000, 8, 5, 5, 10, 11, 24, 9]`), &s)
-			So(err, ShouldBeNil)
+			Convey("When simple unmarshalling", func() {
+				s := New()
+				err := json.Unmarshal([]byte(`[1, 2, 0, 1000, 8, 5, 5, 10, 11, 24, 9]`), &s)
+				So(err, ShouldBeNil)
 
-			validRes := []uint64{0, 1, 2, 5, 8, 9, 10, 11, 24, 1000}
-			So(s.List(), ShouldResemble, validRes)
-			for _, v := range validRes {
-				So(s.Has(v), ShouldBeTrue)
-			}
+				validRes := []uint64{0, 1, 2, 5, 8, 9, 10, 11, 24, 1000}
+				So(s.List(), ShouldResemble, validRes)
+				for _, v := range validRes {
+					So(s.Has(v), ShouldBeTrue)
+				}
+
+			})
+
+			Convey("Check initialized", func() {
+				s, err := NewFromJSON([]byte(`[]`))
+				So(err, ShouldBeNil)
+				So(s.Initialized(), ShouldBeTrue)
+
+				s, err = NewFromJSON([]byte(`null`))
+				So(err, ShouldBeNil)
+				So(s.Initialized(), ShouldBeFalse)
+			})
 		})
 
 		Convey("Check delete", func() {
-			s := UINT64Set{}
+			s := New()
 			err := json.Unmarshal([]byte(`[1, 2, 0, 1000, 8, 5, 5, 10, 11, 24, 9]`), &s)
 			So(err, ShouldBeNil)
 
@@ -115,11 +128,11 @@ func TestRibbons(t *testing.T) {
 
 		Convey("Check sum", func() {
 			Convey("When adding 2 sets", func() {
-				s1 := UINT64Set{}
+				s1 := New()
 				err := json.Unmarshal([]byte(`[13, 10, 11, 24, 0, 9]`), &s1)
 				So(err, ShouldBeNil)
 
-				s2 := UINT64Set{}
+				s2 := New()
 				err = json.Unmarshal([]byte(`[5, 6, 7, 0]`), &s2)
 				So(err, ShouldBeNil)
 
@@ -128,32 +141,33 @@ func TestRibbons(t *testing.T) {
 			})
 
 			Convey("When adding to the empty set", func() {
-				s1 := UINT64Set{}
+				s1 := New()
 				err := json.Unmarshal([]byte(`[5, 6, 7, 0]`), &s1)
 				So(err, ShouldBeNil)
 
-				s2 := UINT64Set{}
+				s2 := New()
 				s2.Sum(&s1)
 				So(s2.List(), ShouldResemble, []uint64{0, 5, 6, 7})
 			})
 
 			Convey("When adding empty set", func() {
-				s1 := UINT64Set{}
+				s1 := New()
 				err := json.Unmarshal([]byte(`[5, 6, 7, 0]`), &s1)
 				So(err, ShouldBeNil)
 
-				s1.Sum(&UINT64Set{})
+				s2 := New()
+				s1.Sum(&s2)
 				So(s1.List(), ShouldResemble, []uint64{0, 5, 6, 7})
 			})
 		})
 
 		Convey("Check multiplication", func() {
 			Convey("When multiplying 2 sets", func() {
-				s1 := UINT64Set{}
+				s1 := New()
 				err := json.Unmarshal([]byte(`[13, 10, 11, 24, 0, 9]`), &s1)
 				So(err, ShouldBeNil)
 
-				s2 := UINT64Set{}
+				s2 := New()
 				err = json.Unmarshal([]byte(`[5, 11, 7, 0]`), &s2)
 				So(err, ShouldBeNil)
 
@@ -162,11 +176,11 @@ func TestRibbons(t *testing.T) {
 			})
 
 			Convey("When multiplying 2 sets with 1 empty set", func() {
-				s1 := UINT64Set{}
+				s1 := New()
 				err := json.Unmarshal([]byte(`[13, 10, 11, 24, 0, 9]`), &s1)
 				So(err, ShouldBeNil)
 
-				s2 := UINT64Set{}
+				s2 := New()
 				err = json.Unmarshal([]byte(`[]`), &s2)
 				So(err, ShouldBeNil)
 
@@ -175,8 +189,8 @@ func TestRibbons(t *testing.T) {
 			})
 
 			Convey("When multiplying 2 empty sets", func() {
-				s1 := UINT64Set{}
-				s2 := UINT64Set{}
+				s1 := New()
+				s2 := New()
 
 				s1.Mul(&s2)
 				So(s1.List(), ShouldResemble, []uint64{})
