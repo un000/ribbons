@@ -126,6 +126,23 @@ func TestRibbons(t *testing.T) {
 			So(s.Len(), ShouldEqual, 0)
 		})
 
+		Convey("Check add -> delete -> add minumum", func() {
+			s := New()
+			err := json.Unmarshal([]byte(`[0, 1]`), &s)
+			So(err, ShouldBeNil)
+
+			s.Delete(0)
+			So(s.List(), ShouldResemble, []uint64{1})
+			s.Add(0)
+			So(s.List(), ShouldResemble, []uint64{0, 1})
+
+			s.Delete(0)
+			s.Delete(1)
+			So(s.List(), ShouldResemble, []uint64{})
+			s.Add(1)
+			So(s.List(), ShouldResemble, []uint64{1})
+		})
+
 		Convey("Check sum", func() {
 			Convey("When adding 2 sets", func() {
 				s1 := New()

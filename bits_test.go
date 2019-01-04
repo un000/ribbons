@@ -38,7 +38,7 @@ func TestBits(t *testing.T) {
 		Convey("Check extract", func() {
 			u := uint64(9)
 
-			bits := extractToggledBits(u, 0)
+			bits := extractToggledBits(bucketSize, u, 0)
 			So(bits, ShouldResemble, []uint64{0, 3})
 		})
 	})

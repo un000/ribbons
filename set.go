@@ -5,10 +5,14 @@ import (
 	"fmt"
 )
 
+type bucket = uint64
+
+const bucketSize = 64
+
 type UINT64Set struct {
 	// min is the value of the first element
 	min  uint64
-	set  []uint64
+	set  []bucket
 	size int
 
 	initialized bool
@@ -48,23 +52,21 @@ func (u *UINT64Set) Add(key uint64) *UINT64Set {
 		u.set = append(u.set, 1)
 		u.size++
 		u.initialized = true
-	case u.initialized && key == u.min:
-		return u
-	case key > u.min:
+	case key >= u.min:
 		if u.Has(key) {
 			return u
 		}
 
-		bucket := u.getBucketNumber(key)
-		if bucket >= len(u.set) {
-			u.set = append(u.set, make([]uint64, bucket-len(u.set)+1)...)
+		bucketN := u.getBucketNumber(key)
+		if bucketN >= len(u.set) {
+			u.set = append(u.set, make([]bucket, bucketN-len(u.set)+1)...)
 		}
 
-		u.set[bucket] = setBit(u.set[bucket], u.getPositionInsideBucket(key))
+		u.set[bucketN] = setBit(u.set[bucketN], u.getPositionInsideBucket(key))
 		u.size++
 		u.initialized = true
 	case key < u.min:
-		newSet := UINT64Set{set: make([]uint64, 0, len(u.set))}
+		newSet := UINT64Set{set: make([]bucket, 0, len(u.set))}
 		newSet.Add(key)
 		for _, prev := range u.List() {
 			newSet.Add(prev)
@@ -112,7 +114,7 @@ func (u *UINT64Set) Mul(u2 *UINT64Set) {
 			continue
 		}
 
-		for _, v := range extractToggledBits(u.set[i], u.min+i*64) {
+		for _, v := range extractToggledBits(bucketSize, u.set[i], u.min+i*bucketSize) {
 			if !u2.Has(v) {
 				u.Delete(v)
 			}
@@ -123,7 +125,7 @@ func (u *UINT64Set) Mul(u2 *UINT64Set) {
 func (u *UINT64Set) List() []uint64 {
 	res := make([]uint64, 0, u.size)
 	for i, l := uint64(0), uint64(len(u.set)); i < l; i++ {
-		values := extractToggledBits(u.set[i], u.min+i*64)
+		values := extractToggledBits(bucketSize, u.set[i], u.min+i*bucketSize)
 		if len(values) > 0 {
 			res = append(res, values...)
 		}
@@ -137,9 +139,9 @@ func (u *UINT64Set) Initialized() bool {
 }
 
 func (u *UINT64Set) getPositionInsideBucket(key uint64) uint64 {
-	return (key - u.min) % 64
+	return (key - u.min) % bucketSize
 }
 
 func (u *UINT64Set) getBucketNumber(key uint64) int {
-	return int((key - u.min) / 64)
+	return int((key - u.min) / bucketSize)
 }
