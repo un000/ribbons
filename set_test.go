@@ -143,6 +143,18 @@ func TestRibbons(t *testing.T) {
 			So(s.List(), ShouldResemble, []uint64{1})
 		})
 
+		Convey("Check delete unknown", func() {
+			s := New()
+			err := json.Unmarshal([]byte(`[63, 64, 200]`), &s)
+			So(err, ShouldBeNil)
+
+			s.Delete(0)
+			So(s.List(), ShouldResemble, []uint64{63, 64, 200})
+
+			s.Delete(300)
+			So(s.List(), ShouldResemble, []uint64{63, 64, 200})
+		})
+
 		Convey("Check sum", func() {
 			Convey("When adding 2 sets", func() {
 				s1 := New()

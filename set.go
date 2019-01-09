@@ -80,7 +80,7 @@ func (u *UINT64Set) Add(key uint64) *UINT64Set {
 }
 
 func (u *UINT64Set) Delete(key uint64) {
-	if !u.initialized || len(u.set) == 0 {
+	if !u.initialized || len(u.set) == 0 || key < u.min {
 		return
 	}
 
