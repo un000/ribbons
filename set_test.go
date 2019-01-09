@@ -153,7 +153,7 @@ func TestRibbons(t *testing.T) {
 				err = json.Unmarshal([]byte(`[5, 6, 7, 0]`), &s2)
 				So(err, ShouldBeNil)
 
-				s1.Sum(&s2)
+				s1.Or(&s2)
 				So(s1.List(), ShouldResemble, []uint64{0, 5, 6, 7, 9, 10, 11, 13, 24})
 			})
 
@@ -163,7 +163,7 @@ func TestRibbons(t *testing.T) {
 				So(err, ShouldBeNil)
 
 				s2 := New()
-				s2.Sum(&s1)
+				s2.Or(&s1)
 				So(s2.List(), ShouldResemble, []uint64{0, 5, 6, 7})
 			})
 
@@ -173,7 +173,7 @@ func TestRibbons(t *testing.T) {
 				So(err, ShouldBeNil)
 
 				s2 := New()
-				s1.Sum(&s2)
+				s1.Or(&s2)
 				So(s1.List(), ShouldResemble, []uint64{0, 5, 6, 7})
 			})
 		})
@@ -188,7 +188,7 @@ func TestRibbons(t *testing.T) {
 				err = json.Unmarshal([]byte(`[5, 11, 7, 0]`), &s2)
 				So(err, ShouldBeNil)
 
-				s1.Mul(&s2)
+				s1.And(&s2)
 				So(s1.List(), ShouldResemble, []uint64{0, 11})
 			})
 
@@ -201,7 +201,7 @@ func TestRibbons(t *testing.T) {
 				err = json.Unmarshal([]byte(`[]`), &s2)
 				So(err, ShouldBeNil)
 
-				s1.Mul(&s2)
+				s1.And(&s2)
 				So(s1.List(), ShouldResemble, []uint64{})
 			})
 
@@ -209,8 +209,21 @@ func TestRibbons(t *testing.T) {
 				s1 := New()
 				s2 := New()
 
-				s1.Mul(&s2)
+				s1.And(&s2)
 				So(s1.List(), ShouldResemble, []uint64{})
+			})
+
+			Convey("When inverse", func() {
+				s1 := New()
+				err := json.Unmarshal([]byte(`[13, 10, 11]`), &s1)
+				So(err, ShouldBeNil)
+
+				s2 := New()
+				err = json.Unmarshal([]byte(`[5, 10]`), &s2)
+				So(err, ShouldBeNil)
+
+				s1.AndNot(&s2)
+				So(s1.List(), ShouldResemble, []uint64{11, 13})
 			})
 		})
 	})

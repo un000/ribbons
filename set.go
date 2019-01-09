@@ -101,21 +101,27 @@ func (u *UINT64Set) Len() int {
 	return u.size
 }
 
-func (u *UINT64Set) Sum(u2 *UINT64Set) {
+func (u *UINT64Set) Or(u2 *UINT64Set) {
 	second := u2.List()
 	for i := range second {
 		u.Add(second[i])
 	}
 }
 
-func (u *UINT64Set) Mul(u2 *UINT64Set) {
+func (u *UINT64Set) And(u2 *UINT64Set) {
 	for i, l := uint64(0), uint64(len(u.set)); i < l; i++ {
-		if u.set[i] == 0 {
-			continue
-		}
-
 		for _, v := range extractToggledBits(bucketSize, u.set[i], u.min+i*bucketSize) {
 			if !u2.Has(v) {
+				u.Delete(v)
+			}
+		}
+	}
+}
+
+func (u *UINT64Set) AndNot(u2 *UINT64Set) {
+	for i, l := uint64(0), uint64(len(u.set)); i < l; i++ {
+		for _, v := range extractToggledBits(bucketSize, u.set[i], u.min+i*bucketSize) {
+			if u2.Has(v) {
 				u.Delete(v)
 			}
 		}
