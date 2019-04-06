@@ -141,7 +141,7 @@ func (u *UINT64Set) List() []uint64 {
 }
 
 func (u *UINT64Set) Initialized() bool {
-	return u.initialized
+	return u != nil && u.initialized
 }
 
 func (u *UINT64Set) getPositionInsideBucket(key uint64) uint64 {
