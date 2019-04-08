@@ -68,6 +68,17 @@ func TestRibbons(t *testing.T) {
 			}
 		})
 
+		Convey("Check has any", func() {
+			s := New()
+			s.Add(5)
+			s.Add(8)
+			s.Add(32)
+
+			So(s.HasAny([]uint64{5, 32}), ShouldBeTrue)
+			So(s.HasAny([]uint64{1, 2}), ShouldBeFalse)
+			So(s.HasAny([]uint64{}), ShouldBeFalse)
+		})
+
 		Convey("Check unmarshal", func() {
 			Convey("When simple unmarshalling", func() {
 				s := New()

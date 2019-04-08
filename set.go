@@ -128,6 +128,16 @@ func (u *UINT64Set) AndNot(u2 *UINT64Set) {
 	}
 }
 
+func (u *UINT64Set) HasAny(s []uint64) bool {
+	for _, v := range s {
+		if u.Has(v) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (u *UINT64Set) List() []uint64 {
 	res := make([]uint64, 0, u.size)
 	for i, l := uint64(0), uint64(len(u.set)); i < l; i++ {
