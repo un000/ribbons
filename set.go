@@ -33,7 +33,7 @@ func NewFromJSON(j []byte) (UINT64Set, error) {
 }
 
 func (u *UINT64Set) Has(key uint64) bool {
-	if !u.initialized || len(u.set) == 0 || key < u.min {
+	if u == nil || !u.initialized || len(u.set) == 0 || key < u.min {
 		return false
 	}
 
